@@ -96,8 +96,8 @@ export default function WaitlistForm() {
         if (data.count) {
           setWaitlistCount(data.count);
         }
-        // Pre-generate the initial dynamic tweet URL
-        await generateTweet();
+        // Pre-generate the initial dynamic tweet URL (non-blocking)
+        generateTweet();
       } else {
         setStatus("error");
         setMessage(data.error || "ERR // UNKNOWN_FAILURE. RETRY.");
