@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import ThemeProvider from "@/components/ThemeProvider";
 import CrabCursor from "@/components/CrabCursor";
 import "./globals.css";
@@ -34,6 +35,7 @@ export default function RootLayout({
         <ThemeProvider>
           <CrabCursor />
           {children}
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
