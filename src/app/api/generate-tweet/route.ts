@@ -50,9 +50,9 @@ export async function POST(request: Request) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     // Suffix containing URL and required tags
-    const suffix = "\n\nwaitlist.clawxlab.xyz \n @avax @AvaLabs @AvaxTeam1 @Team1IND @AvalancheFDN";
+    const suffix = "\n\n@ClawXLabs | waitlist.clawxlab.xyz \n@avax @AvaLabs @AvaxTeam1 @Team1IND @AvalancheFDN";
     // Max characters allowed for the dynamic content to stay under 280 characters total
-    const maxDynamicLength = 280 - suffix.length; // 207 characters
+    const maxDynamicLength = 280 - suffix.length;
 
     if (apiKey && apiKey !== "your_free_gemini_api_key_here") {
       try {
