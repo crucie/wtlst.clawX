@@ -1,6 +1,48 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 
+// In-memory store for mock registrations during local development/testing
+let mockRegistrationsCount = 0;
+const mockRegisteredEmails = new Set<string>();
+const BASE_WAITLIST_OFFSET = parseInt(process.env.BASE_WAITLIST_OFFSET || "0", 10);
+
+export async function GET() {
+  try {
+    if (!process.env.MONGODB_URI) {
+      return NextResponse.json({
+        success: true,
+        count: BASE_WAITLIST_OFFSET + mockRegistrationsCount,
+        isMock: true
+      });
+    }
+
+    try {
+      const client = await clientPromise;
+      if (!client) throw new Error("MongoDB client is null");
+      
+      const db = client.db("clawx");
+      const collection = db.collection("waitlist");
+      const dbCount = await collection.countDocuments();
+
+      return NextResponse.json({
+        success: true,
+        count: BASE_WAITLIST_OFFSET + dbCount,
+        isMock: false
+      });
+    } catch (dbError) {
+      console.warn("⚠️ Failed to read waitlist count from database. Using mock fallback:", dbError);
+      return NextResponse.json({
+        success: true,
+        count: BASE_WAITLIST_OFFSET + mockRegistrationsCount,
+        isMock: true
+      });
+    }
+  } catch (error: any) {
+    console.error("Waitlist GET failed:", error);
+    return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
@@ -19,6 +61,17 @@ export async function POST(request: Request) {
     if (!process.env.MONGODB_URI) {
       console.warn("⚠️ MONGODB_URI is not set in environment variables. Operating in Mock Mode.");
       
+      if (mockRegisteredEmails.has(normalizedEmail)) {
+        return NextResponse.json(
+          { error: "This email is already registered. Please use a different email address." },
+          { status: 400 }
+        );
+      }
+
+      mockRegisteredEmails.add(normalizedEmail);
+      mockRegistrationsCount++;
+      const currentPosition = BASE_WAITLIST_OFFSET + mockRegistrationsCount;
+
       // Simulate database delay
       await new Promise((resolve) => setTimeout(resolve, 800));
 
@@ -26,55 +79,89 @@ export async function POST(request: Request) {
         success: true,
         message: "Successfully registered on the waitlist (Mock Mode).",
         email: normalizedEmail,
+        position: currentPosition,
+        count: currentPosition,
         isMock: true,
       });
     }
 
     // Connect to database and insert email
-    const client = await clientPromise;
-    const db = client.db("clawx");
-    const collection = db.collection("waitlist");
+    let client;
+    try {
+      client = await clientPromise;
+      if (!client) throw new Error("MongoDB client is null");
+      
+      const db = client.db("clawx");
+      const collection = db.collection("waitlist");
 
-    // Ensure unique index is configured at database level
-    await collection.createIndex({ email: 1 }, { unique: true }).catch((err) => {
-      console.warn("Index check/creation warning:", err.message);
-    });
+      // Ensure unique index is configured at database level
+      await collection.createIndex({ email: 1 }, { unique: true }).catch((err) => {
+        console.warn("Index check/creation warning:", err.message);
+      });
 
-    // Check if the email is already registered
-    const existingEntry = await collection.findOne({ email: normalizedEmail });
-    if (existingEntry) {
+      // Check if the email is already registered
+      const existingEntry = await collection.findOne({ email: normalizedEmail });
+      if (existingEntry) {
+        return NextResponse.json(
+          { error: "This email is already registered. Please use a different email address." },
+          { status: 400 }
+        );
+      }
+
+      // Insert record with duplicate key validation
+      try {
+        await collection.insertOne({
+          email: normalizedEmail,
+          registeredAt: new Date(),
+        });
+      } catch (dbError: any) {
+        if (dbError.code === 11000) {
+          return NextResponse.json(
+            { error: "This email is already registered. Please use a different email address." },
+            { status: 400 }
+          );
+        }
+        throw dbError;
+      }
+
+      const dbCount = await collection.countDocuments();
+      const currentCount = BASE_WAITLIST_OFFSET + dbCount;
+
       return NextResponse.json({
         success: true,
-        message: "You are already on the waitlist!",
+        message: "Successfully joined the waitlist.",
         email: normalizedEmail,
-        alreadyRegistered: true,
+        position: currentCount,
+        count: currentCount,
+        isMock: false,
       });
-    }
 
-    // Insert record with duplicate key validation
-    try {
-      await collection.insertOne({
-        email: normalizedEmail,
-        registeredAt: new Date(),
-      });
-    } catch (dbError: any) {
-      if (dbError.code === 11000) {
-        return NextResponse.json({
-          success: true,
-          message: "You are already on the waitlist!",
-          email: normalizedEmail,
-          alreadyRegistered: true,
-        });
+    } catch (dbConnectError) {
+      console.warn("⚠️ Failed to connect to MongoDB. Operating in Mock Mode:", dbConnectError);
+      
+      if (mockRegisteredEmails.has(normalizedEmail)) {
+        return NextResponse.json(
+          { error: "This email is already registered. Please use a different email address." },
+          { status: 400 }
+        );
       }
-      throw dbError;
-    }
 
-    return NextResponse.json({
-      success: true,
-      message: "Successfully joined the waitlist.",
-      email: normalizedEmail,
-      isMock: false,
-    });
+      mockRegisteredEmails.add(normalizedEmail);
+      mockRegistrationsCount++;
+      const currentPosition = BASE_WAITLIST_OFFSET + mockRegistrationsCount;
+
+      // Simulate database delay
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      return NextResponse.json({
+        success: true,
+        message: "Successfully registered on the waitlist (Mock Mode).",
+        email: normalizedEmail,
+        position: currentPosition,
+        count: currentPosition,
+        isMock: true,
+      });
+    }
   } catch (error: any) {
     console.error("Waitlist registration failed:", error);
     return NextResponse.json(

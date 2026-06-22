@@ -1,8 +1,153 @@
 @import "tailwindcss";
 
+/* ── Dark mode (default) ───────────────────────────────────────────── */
 :root {
   --background: #030303;
   --foreground: #ffffff;
+
+  /* Page surfaces */
+  --clx-bg: #0d0d0d;
+  --clx-bg-alt: #0d0d0d;
+  --clx-card-bg: #111;
+  --clx-card-border: rgba(232, 65, 66, 0.35);
+  --clx-card-outer-border: #E84142;
+
+  /* Text */
+  --clx-text: #ffffff;
+  --clx-text-muted: rgba(255, 255, 255, 0.45);
+  --clx-text-dim: rgba(255, 255, 255, 0.2);
+  --clx-text-comment: rgba(255, 255, 255, 0.35);
+
+  /* Brand */
+  --clx-red: #E84142;
+  --clx-red-muted: rgba(232, 65, 66, 0.5);
+
+  /* Grid lines */
+  --clx-grid-hero: rgba(232, 65, 66, 0.07);
+  --clx-grid-section: rgba(232, 65, 66, 0.05);
+
+  /* Ticker bar */
+  --clx-ticker-bg: #E84142;
+  --clx-ticker-text: #000;
+
+  /* Marquee */
+  --clx-marquee-bg: #000;
+  --clx-marquee-border: #000;
+  --clx-marquee-star: rgba(255, 255, 255, 0.4);
+
+  /* Counter widget */
+  --clx-counter-bg: #000;
+  --clx-counter-border: #E84142;
+  --clx-counter-label: #E84142;
+  --clx-counter-value: #fff;
+
+  /* Waitlist section — same dark bg in dark mode */
+  --clx-section-bg: #0d0d0d;
+
+  /* Scanline */
+  --clx-scanline-alpha: 0.08;
+
+  /* Footer */
+  --clx-footer-border: rgba(232, 65, 66, 0.2);
+
+  /* Scrollbar */
+  --clx-scrollbar-track: #030303;
+  --clx-scrollbar-thumb: #E84142;
+
+  /* Input */
+  --clx-input-bg: #0d0d0d;
+  --clx-input-border: rgba(232, 65, 66, 0.5);
+  --clx-input-text: #fff;
+  --clx-input-placeholder: rgba(255, 255, 255, 0.2);
+
+  /* Button */
+  --clx-btn-bg: #E84142;
+  --clx-btn-text: #000;
+  --clx-btn-hover-bg: #000;
+  --clx-btn-hover-text: #E84142;
+
+  /* Success bar */
+  --clx-success-bg: #E84142;
+  --clx-success-text: #000;
+
+  /* Error */
+  --clx-error-bg: rgba(232, 65, 66, 0.1);
+  --clx-error-border: rgba(232, 65, 66, 0.4);
+}
+
+/* ── Light mode ────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --background: #F4F0EC;
+  --foreground: #1a1a1a;
+
+  /* Page surfaces */
+  --clx-bg: #F4F0EC;
+  --clx-bg-alt: #EDE8E3;
+  --clx-card-bg: #fff;
+  --clx-card-border: rgba(232, 65, 66, 0.2);
+  --clx-card-outer-border: #E84142;
+
+  /* Text */
+  --clx-text: #1a1a1a;
+  --clx-text-muted: rgba(0, 0, 0, 0.5);
+  --clx-text-dim: rgba(0, 0, 0, 0.25);
+  --clx-text-comment: rgba(0, 0, 0, 0.4);
+
+  /* Brand — slightly darker red for better contrast on light */
+  --clx-red: #C7282A;
+  --clx-red-muted: rgba(199, 40, 42, 0.35);
+
+  /* Grid lines */
+  --clx-grid-hero: rgba(199, 40, 42, 0.06);
+  --clx-grid-section: rgba(199, 40, 42, 0.04);
+
+  /* Ticker bar */
+  --clx-ticker-bg: #C7282A;
+  --clx-ticker-text: #fff;
+
+  /* Marquee */
+  --clx-marquee-bg: #1a1a1a;
+  --clx-marquee-border: #1a1a1a;
+  --clx-marquee-star: rgba(255, 255, 255, 0.35);
+
+  /* Counter widget */
+  --clx-counter-bg: #fff;
+  --clx-counter-border: #C7282A;
+  --clx-counter-label: #C7282A;
+  --clx-counter-value: #1a1a1a;
+
+  /* Waitlist section — warm off-white for contrast */
+  --clx-section-bg: #FDFAF7;
+
+  /* Scanline */
+  --clx-scanline-alpha: 0.03;
+
+  /* Footer */
+  --clx-footer-border: rgba(199, 40, 42, 0.15);
+
+  /* Scrollbar */
+  --clx-scrollbar-track: #F4F0EC;
+  --clx-scrollbar-thumb: #C7282A;
+
+  /* Input */
+  --clx-input-bg: #F4F0EC;
+  --clx-input-border: rgba(199, 40, 42, 0.4);
+  --clx-input-text: #1a1a1a;
+  --clx-input-placeholder: rgba(0, 0, 0, 0.25);
+
+  /* Button */
+  --clx-btn-bg: #C7282A;
+  --clx-btn-text: #fff;
+  --clx-btn-hover-bg: #fff;
+  --clx-btn-hover-text: #C7282A;
+
+  /* Success bar */
+  --clx-success-bg: #C7282A;
+  --clx-success-text: #fff;
+
+  /* Error */
+  --clx-error-bg: rgba(199, 40, 42, 0.08);
+  --clx-error-border: rgba(199, 40, 42, 0.3);
 }
 
 @theme inline {
@@ -19,10 +164,11 @@
 }
 
 body {
-  background: #E84142;
+  background: var(--clx-red);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 
 /* Background grid effect */
@@ -78,8 +224,21 @@ body {
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #030303;
+  background: var(--clx-scrollbar-track);
 }
 ::-webkit-scrollbar-thumb {
-  background: #E84142;
+  background: var(--clx-scrollbar-thumb);
+}
+
+/* Smooth theme transitions on key elements */
+[data-theme] * {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+/* Exclude elements where transition causes visual glitches */
+[data-theme] svg *,
+[data-theme] .no-theme-transition,
+[data-theme] [style*="will-change"] {
+  transition: none;
 }
