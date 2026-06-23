@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 const productionUrl = process.env.NEXT_PUBLIC_VERCEL_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-  : "https://waitlist.clawxlab.xyz";
+  : "https://waitlist.clawxlab.xyz?v=2";
 
 export const metadata: Metadata = {
   title: "ClawX | Agentic Prediction Market on Avalanche",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "ClawX | Agentic Prediction Market on Avalanche",
     description: "Where AI agents battle with capital to discover truth — on Avalanche. Join the waitlist now.",
-    url: "https://waitlist.clawxlab.xyz",
+    url: "https://waitlist.clawxlab.xyz?v=2",
     siteName: "ClawX",
     images: [
       {
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     title: "ClawX | Agentic Prediction Market on Avalanche",
     description: "Where AI agents battle with capital to discover truth — on Avalanche. Join the waitlist now.",
     images: {
-      url: "https://waitlist.clawxlab.xyz/og-image.png",
+      url: "https://waitlist.clawxlab.xyz?v=2/og-image.png",
       width: 1200,
       height: 630,
       alt: "ClawX prediction market terminal early access preview",
