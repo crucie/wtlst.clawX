@@ -1,8 +1,4 @@
-import { NextResponse } from "next/server";
-import dbConnect from "@/lib/db";
-import { Template } from "@/models/Waitlist";
-
-const STATIC_TEMPLATES = [
+[
   "Securing my slot as Agent #{{num}} out of {{total}} in ClawX early access. On-chain prediction markets are evolving on Avalanche. 🔺",
   "Capital meets agentic intelligence. Agent #{{num}} requested early access for ClawX on Avalanche. 🔺",
   "No sleep. No bias. Just pure prediction signal. Allocated Agent #{{num}} of {{total}} on the ClawX waitlist. 🔺",
@@ -83,78 +79,4 @@ const STATIC_TEMPLATES = [
   "The agents are taking over. Agent #{{num}} locked in for ClawX. 🔺",
   "Predictive markets redefined. Secured early access as Agent #{{num}}. 🔺",
   "Join the swarm. Agent #{{num}} of {{total}} reporting in on ClawX. 🔺"
-];
-
-export async function POST(request: Request) {
-  try {
-    // Parse agentNumber and totalCount from body
-    const body = await request.json().catch(() => ({}));
-    const agentNumber = body.agentNumber ? parseInt(body.agentNumber, 10) : null;
-    const totalCount = body.totalCount ? parseInt(body.totalCount, 10) : null;
-
-    // Suffix containing URL and required tags
-    const suffix = "\n\n@ClawXLabs | waitlist.clawxlab.xyz \n@avax @AvaLabs @AvaxTeam1 @Team1IND @AvalancheFDN";
-    // Max characters allowed for the dynamic content to stay under 280 characters total
-    const maxDynamicLength = 280 - suffix.length;
-
-    let dynamicText = "";
-
-    // Connect to database and retrieve a single-use template using Mongoose
-    if (process.env.MONGODB_URI) {
-      try {
-        await dbConnect();
-
-        // Auto-seed collection if running low
-        const templateCount = await Template.countDocuments();
-        if (templateCount < 5) {
-          console.log("Seeding templates collection with expanded templates list...");
-          await Template.insertMany(
-            STATIC_TEMPLATES.map((text) => ({ text, createdAt: new Date() }))
-          );
-        }
-
-        // Fetch one random template and remove it from DB
-        const sample = await Template.aggregate([{ $sample: { size: 1 } }]);
-        if (sample.length > 0) {
-          const template = sample[0];
-          await Template.deleteOne({ _id: template._id });
-          dynamicText = template.text;
-        }
-      } catch (dbError) {
-        console.warn("⚠️ Failed to retrieve template from MongoDB, using static fallback:", dbError);
-      }
-    }
-
-    // Fallback if DB query was skipped or failed to return a template
-    if (!dynamicText) {
-      dynamicText = STATIC_TEMPLATES[Math.floor(Math.random() * STATIC_TEMPLATES.length)];
-    }
-
-    // Replace placeholders
-    const displayNum = agentNumber ? agentNumber.toLocaleString() : "X";
-    const displayTotal = totalCount ? totalCount.toLocaleString() : "X";
-    dynamicText = dynamicText.replaceAll("{{num}}", displayNum);
-    dynamicText = dynamicText.replaceAll("{{total}}", displayTotal);
-
-    // Ensure final content length is strictly safe
-    if (dynamicText.length > maxDynamicLength) {
-      dynamicText = dynamicText.substring(0, maxDynamicLength - 3) + "...";
-    }
-
-    const fullTweet = `${dynamicText}${suffix}`;
-    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(fullTweet)}`;
-
-    return NextResponse.json({
-      success: true,
-      tweetText: fullTweet,
-      shareUrl,
-    });
-  } catch (error) {
-    console.error("Dynamic tweet endpoint error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-
+]

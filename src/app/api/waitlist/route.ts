@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import clientPromise from "@/lib/mongodb";
+import dbConnect from "@/lib/db";
+import { Waitlist } from "@/models/Waitlist";
 
 // In-memory store for mock registrations during local development/testing
 let mockRegistrationsCount = 0;
@@ -17,12 +18,8 @@ export async function GET() {
     }
 
     try {
-      const client = await clientPromise;
-      if (!client) throw new Error("MongoDB client is null");
-      
-      const db = client.db("clawx");
-      const collection = db.collection("waitlist");
-      const dbCount = await collection.countDocuments();
+      await dbConnect();
+      const dbCount = await Waitlist.countDocuments();
 
       return NextResponse.json({
         success: true,
@@ -85,22 +82,12 @@ export async function POST(request: Request) {
       });
     }
 
-    // Connect to database and insert email
-    let client;
+    // Connect to database and insert email using Mongoose
     try {
-      client = await clientPromise;
-      if (!client) throw new Error("MongoDB client is null");
-      
-      const db = client.db("clawx");
-      const collection = db.collection("waitlist");
-
-      // Ensure unique index is configured at database level
-      await collection.createIndex({ email: 1 }, { unique: true }).catch((err) => {
-        console.warn("Index check/creation warning:", err.message);
-      });
+      await dbConnect();
 
       // Check if the email is already registered
-      const existingEntry = await collection.findOne({ email: normalizedEmail });
+      const existingEntry = await Waitlist.findOne({ email: normalizedEmail });
       if (existingEntry) {
         return NextResponse.json(
           { error: "This email is already registered. Please use a different email address." },
@@ -108,11 +95,11 @@ export async function POST(request: Request) {
         );
       }
 
-      // Insert record with duplicate key validation
+      // Insert record
       try {
-        await collection.insertOne({
+        await Waitlist.create({
           email: normalizedEmail,
-          registeredAt: new Date(),
+          joinedAt: new Date(),
         });
       } catch (dbError: any) {
         if (dbError.code === 11000) {
@@ -124,7 +111,7 @@ export async function POST(request: Request) {
         throw dbError;
       }
 
-      const dbCount = await collection.countDocuments();
+      const dbCount = await Waitlist.countDocuments();
       const currentCount = BASE_WAITLIST_OFFSET + dbCount;
 
       return NextResponse.json({

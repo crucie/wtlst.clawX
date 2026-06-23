@@ -30,29 +30,40 @@ export default function WaitlistForm() {
 
   // Fetch initial waitlist count on mount and poll for real-time updates
   useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
     const fetchCount = async () => {
       try {
-        const res = await fetch("/api/waitlist");
+        const res = await fetch("/api/waitlist", { signal: controller.signal });
         const data = await res.json();
-        if (data.success) {
+        if (isMounted && data.success) {
           setWaitlistCount(data.count);
         }
-      } catch (err) {
-        console.error("Failed to fetch initial waitlist count:", err);
+      } catch {
+        // Silently ignore — the polling interval will retry automatically
       }
     };
-    fetchCount();
+
+    // Small delay before the initial fetch to let hydration complete
+    const initialTimer = setTimeout(fetchCount, 100);
     const interval = setInterval(fetchCount, 5000);
-    return () => clearInterval(interval);
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
   }, []);
 
-  const generateTweet = async (agentNumber?: number) => {
+  const generateTweet = async (agentNumber?: number, totalCount?: number) => {
     setIsCompiling(true);
     try {
       const res = await fetch("/api/generate-tweet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ agentNumber }),
+        body: JSON.stringify({ agentNumber, totalCount }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -98,7 +109,7 @@ export default function WaitlistForm() {
           setWaitlistCount(data.count);
         }
         // Pre-generate the initial dynamic tweet URL (non-blocking)
-        generateTweet(data.count);
+        generateTweet(data.count, data.count);
       } else {
         setStatus("error");
         setMessage(data.error || "ERR // UNKNOWN_FAILURE. RETRY.");
@@ -164,6 +175,26 @@ export default function WaitlistForm() {
 
           {/* Card body */}
           <div className="p-8">
+            {/* Prominent Counter */}
+            {waitlistCount !== null && (
+              <div className="mb-8 text-center" style={{ borderBottom: "1px dashed var(--clx-card-border)", paddingBottom: "20px" }}>
+                <h2
+                  className="font-mono font-bold uppercase"
+                  style={{
+                    fontSize: "clamp(24px, 4vw, 36px)",
+                    color: "var(--clx-red)",
+                    letterSpacing: "0.05em",
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {waitlistCount.toLocaleString()} Agents
+                </h2>
+                <div className="font-mono text-[10px] uppercase tracking-widest mt-2" style={{ color: "var(--clx-text-muted)" }}>
+                  Have joined the prediction arena
+                </div>
+              </div>
+            )}
+
             <AnimatePresence mode="wait">
               {status !== "success" ? (
                 <motion.div

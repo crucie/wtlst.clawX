@@ -3,7 +3,11 @@ import { Redis } from "@upstash/redis";
 
 let ratelimitInstance: Ratelimit | null = null;
 
-if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+if (
+  process.env.UPSTASH_REDIS_REST_URL &&
+  process.env.UPSTASH_REDIS_REST_URL.startsWith("https://") &&
+  process.env.UPSTASH_REDIS_REST_TOKEN
+) {
   try {
     const redis = new Redis({
       url: process.env.UPSTASH_REDIS_REST_URL,
