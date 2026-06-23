@@ -1,35 +1,36 @@
 import { NextResponse } from "next/server";
 import { checkRateLimit } from "@/lib/ratelimit";
+import clientPromise from "@/lib/mongodb";
 
-const TWEET_TEMPLATES = [
-  "Securing my slot in the ClawX swarm. On-chain prediction markets are evolving on Avalanche. 🔺",
-  "Capital meets swarm intelligence. Early access requested for ClawX on Avalanche. 🔺",
-  "No sleep. No bias. Just pure prediction signal. Joined the ClawX waitlist. 🔺",
-  "Validating prediction models and locking in early access for ClawX on Avalanche. 🔺",
-  "The swarm intelligence is waking up. Secured my early access to ClawX prediction market.",
-  "AI agents are running predictive simulations on Avalanche. My slot is locked in. 🔺",
-  "Prediction markets meet autonomous agent networks. Secured entry for ClawX on Avalanche.",
-  "The algorithms are scanning the market. Early access to ClawX is officially granted.",
-  "AI-powered forecasting is going live on Avalanche. Secured my spot in the ClawX waitlist. 🔺",
-  "Decentralized prediction markets are getting an upgrade. Joined the ClawX agent swarm.",
-  "Just secured early access to the next generation of agentic prediction markets.",
-  "On-chain prediction models running 24/7. Locked my early access to ClawX. 🔺",
-  "Swarm forecasting is the new meta. Secured my agent slot on the ClawX waitlist.",
-  "Letting the machine learning models handle the forecasting. Secured my spot.",
-  "No human bias, just raw algorithmic consensus. Joined the ClawX waitlist. 🔺",
-  "Agentic intelligence running predictive consensus on Avalanche. Early access locked. 🔺",
-  "Step into the predictive swarm. Early access spot secured for ClawX on Avalanche.",
-  "AI agents are processing predictive probability metrics. Securing entry to ClawX.",
-  "The future of forecasting is agentic and on-chain. Joined the ClawX waitlist. 🔺",
-  "Unlocking data-driven prediction models with ClawX. Secured my early entry.",
-  "The predictive swarm is compiling. Joined the ClawX waitlist on Avalanche. 🔺",
-  "Setting up my node in the ClawX forecasting swarm. Early access confirmed.",
-  "Autonomous agents, decentralized consensus, predictive accuracy. Early access locked.",
-  "Harnessing the power of AI agent prediction models. Joined the ClawX waitlist.",
-  "Sharpening the predictive edge with ClawX. Secure access granted. 🔺",
-  "AI-agent driven analytics on Avalanche. Locked in early waitlist registration.",
-  "The predictions have begun. Secure your access keys for the ClawX swarm.",
-  "Decentralized machine intelligence forecasting the future. Waitlist position secured. 🔺"
+const STATIC_TEMPLATES = [
+  "Securing my slot as Agent #{{num}} in ClawX early access. On-chain prediction markets are evolving on Avalanche. 🔺",
+  "Capital meets agentic intelligence. Agent #{{num}} requested early access for ClawX on Avalanche. 🔺",
+  "No sleep. No bias. Just pure prediction signal. Allocated Agent #{{num}} on the ClawX waitlist. 🔺",
+  "Validating prediction models and locking in early access as Agent #{{num}} for ClawX on Avalanche. 🔺",
+  "Agent #{{num}} allocated. Joined {{num}} early users on the ClawX waitlist on Avalanche. 🔺",
+  "AI agents are running predictive simulations on Avalanche. Slot for Agent #{{num}} is locked in. 🔺",
+  "Prediction markets meet autonomous agent networks. Secured entry as Agent #{{num}} for ClawX. 🔺",
+  "The algorithms are scanning the market. Early access for Agent #{{num}} is officially granted. 🔺",
+  "AI-powered forecasting is going live on Avalanche. Secured my spot as Agent #{{num}} in the ClawX waitlist. 🔺",
+  "Decentralized prediction markets are getting an upgrade. Joined ClawX early access as Agent #{{num}}. 🔺",
+  "Just secured early access as Agent #{{num}} to the next generation of agentic prediction markets on Avalanche. 🔺",
+  "On-chain prediction models running 24/7. Locked my early access as Agent #{{num}} for ClawX. 🔺",
+  "Agentic forecasting is the new meta. Secured my slot as Agent #{{num}} on the ClawX waitlist. 🔺",
+  "Letting the machine learning models handle the forecasting. Secured my spot as Agent #{{num}}. 🔺",
+  "No human bias, just raw algorithmic consensus. Joined the ClawX waitlist as Agent #{{num}}. 🔺",
+  "Agentic intelligence running predictive consensus on Avalanche. Early access slot Agent #{{num}} locked. 🔺",
+  "Step into the predictive arena. Early access spot Agent #{{num}} secured for ClawX on Avalanche. 🔺",
+  "AI agents are processing predictive probability metrics. Securing entry as Agent #{{num}} to ClawX. 🔺",
+  "The future of forecasting is agentic and on-chain. Joined the ClawX waitlist as Agent #{{num}}. 🔺",
+  "Unlocking data-driven prediction models with ClawX. Secured early entry as Agent #{{num}}. 🔺",
+  "The predictive engine is compiling. Joined the ClawX waitlist as Agent #{{num}} on Avalanche. 🔺",
+  "Setting up my node in the ClawX forecasting network. Early access as Agent #{{num}} confirmed. 🔺",
+  "Autonomous agents, decentralized consensus, predictive accuracy. Early access Agent #{{num}} locked. 🔺",
+  "Harnessing the power of AI agent prediction models. Joined the ClawX waitlist as Agent #{{num}}. 🔺",
+  "Sharpening the predictive edge with ClawX. Secure access as Agent #{{num}} granted. 🔺",
+  "AI-agent driven analytics on Avalanche. Locked in early waitlist registration as Agent #{{num}}. 🔺",
+  "The predictions have begun. Secure your access keys as Agent #{{num}} for ClawX. 🔺",
+  "Decentralized machine intelligence forecasting the future. Waitlist position Agent #{{num}} secured. 🔺"
 ];
 
 export async function POST(request: Request) {
@@ -45,51 +46,57 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Generate content (try Gemini API if key is present)
-    let dynamicText = "";
-    const apiKey = process.env.GEMINI_API_KEY;
+    // Parse agentNumber from body
+    const body = await request.json().catch(() => ({}));
+    const agentNumber = body.agentNumber ? parseInt(body.agentNumber, 10) : null;
 
     // Suffix containing URL and required tags
     const suffix = "\n\n@ClawXLabs | waitlist.clawxlab.xyz \n@avax @AvaLabs @AvaxTeam1 @Team1IND @AvalancheFDN";
     // Max characters allowed for the dynamic content to stay under 280 characters total
     const maxDynamicLength = 280 - suffix.length;
 
-    if (apiKey && apiKey !== "your_free_gemini_api_key_here") {
+    let dynamicText = "";
+
+    // Connect to database and retrieve a single-use template
+    if (process.env.MONGODB_URI) {
       try {
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{
-                parts: [{
-                  text: `Write a short, engaging, cyberpunk/tech-styled waitlist announcement tweet for 'ClawX' (an AI agentic prediction market on Avalanche). The tweet must be under ${maxDynamicLength - 20} characters, contain no links, no hashtags, no generic marketing filler, and NO emojis or icons at all EXCEPT for the red triangle (🔺). Just output the clean text.`
-                }]
-              }]
-            }),
-            signal: AbortSignal.timeout(5000) // 5s timeout
+        const client = await clientPromise;
+        if (client) {
+          const db = client.db("clawx");
+          const collection = db.collection("templates");
+
+          // Auto-seed collection if empty
+          const templateCount = await collection.countDocuments();
+          if (templateCount === 0) {
+            console.log("Seeding templates collection with initial templates list...");
+            await collection.insertMany(
+              STATIC_TEMPLATES.map((text) => ({ text, createdAt: new Date() }))
+            );
           }
-        );
-        const data = await response.json();
-        const textOut = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (textOut) {
-          dynamicText = textOut.trim().replace(/[\r\n\"]+/g, "");
-          if (dynamicText.length > maxDynamicLength) {
-            dynamicText = dynamicText.substring(0, maxDynamicLength - 3) + "...";
+
+          // Fetch one random template and remove it from DB
+          const sample = await collection.aggregate([{ $sample: { size: 1 } }]).toArray();
+          if (sample.length > 0) {
+            const template = sample[0];
+            await collection.deleteOne({ _id: template._id });
+            dynamicText = template.text;
           }
         }
-      } catch (err) {
-        console.warn("⚠️ Gemini generation failed, falling back to static template:", err);
+      } catch (dbError) {
+        console.warn("⚠️ Failed to retrieve template from MongoDB, using static fallback:", dbError);
       }
     }
 
-    // Fallback if Gemini failed or key was missing
+    // Fallback if DB query was skipped or failed to return a template
     if (!dynamicText) {
-      dynamicText = TWEET_TEMPLATES[Math.floor(Math.random() * TWEET_TEMPLATES.length)];
+      dynamicText = STATIC_TEMPLATES[Math.floor(Math.random() * STATIC_TEMPLATES.length)];
     }
 
-    // Ensure template or whatever we got is strictly safe
+    // Replace {{num}} placeholders with the formatted agent number
+    const displayNum = agentNumber ? agentNumber.toLocaleString() : "X";
+    dynamicText = dynamicText.replaceAll("{{num}}", displayNum);
+
+    // Ensure final content length is strictly safe
     if (dynamicText.length > maxDynamicLength) {
       dynamicText = dynamicText.substring(0, maxDynamicLength - 3) + "...";
     }

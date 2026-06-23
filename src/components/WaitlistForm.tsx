@@ -46,13 +46,13 @@ export default function WaitlistForm() {
     return () => clearInterval(interval);
   }, []);
 
-  const generateTweet = async () => {
+  const generateTweet = async (agentNumber?: number) => {
     setIsCompiling(true);
     try {
       const res = await fetch("/api/generate-tweet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ agentNumber }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -60,7 +60,8 @@ export default function WaitlistForm() {
         setTweetText(data.tweetText);
       } else {
         console.warn("Failed to generate custom tweet:", data.error);
-        const fallbackText = `I've just secured early access to @ClawXLabs — the native Agentic Prediction Market on Avalanche (🔺). Join waitlist: waitlist.clawxlab.xyz @ClawXLabs @AvalancheFDN`;
+        const displayNum = agentNumber ? `#${agentNumber.toLocaleString()}` : "";
+        const fallbackText = `I've just secured early access ${displayNum ? `as Agent ${displayNum} ` : ""}to @ClawXLabs — the native Agentic Prediction Market on Avalanche (🔺). waitlist.clawxlab.xyz @ClawXLabs @AvalancheFDN`;
         setTweetText(fallbackText);
         setShareUrl(`https://twitter.com/intent/tweet?text=${encodeURIComponent(fallbackText)}`);
       }
@@ -97,7 +98,7 @@ export default function WaitlistForm() {
           setWaitlistCount(data.count);
         }
         // Pre-generate the initial dynamic tweet URL (non-blocking)
-        generateTweet();
+        generateTweet(data.count);
       } else {
         setStatus("error");
         setMessage(data.error || "ERR // UNKNOWN_FAILURE. RETRY.");
