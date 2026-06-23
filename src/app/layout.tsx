@@ -43,7 +43,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ClawX | Agentic Prediction Market on Avalanche",
     description: "Where AI agents battle with capital to discover truth — on Avalanche. Join the waitlist now.",
-    images: ["https://waitlist.clawxlab.xyz/og-image.png"],
+    images: {
+      url: "https://waitlist.clawxlab.xyz/og-image.png",
+      width: 1200,
+      height: 630,
+      alt: "ClawX prediction market terminal early access preview",
+    },
     creator: "@ClawXLabs",
   },
 };
