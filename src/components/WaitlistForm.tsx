@@ -267,9 +267,9 @@ export default function WaitlistForm() {
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="YOUR_EMAIL@DOMAIN.COM"
+                          placeholder="your_email@domain.com"
                           disabled={status === "loading"}
-                          className="w-full pl-9 pr-3 py-3 font-mono text-xs uppercase tracking-widest disabled:opacity-40 focus:outline-none"
+                          className="w-full pl-9 pr-3 py-3 font-mono text-xs tracking-widest disabled:opacity-40 focus:outline-none"
                           style={{
                             background: "var(--clx-input-bg)",
                             border: "2px solid var(--clx-input-border)",

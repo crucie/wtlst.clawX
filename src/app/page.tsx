@@ -150,7 +150,7 @@ export default function Home() {
 
       <div
         className="min-h-screen flex flex-col font-mono select-none overflow-x-hidden"
-        style={{ background: "var(--clx-bg)", cursor: "crosshair" }}
+        style={{ background: "var(--clx-bg)", cursor: "none" }}
       >
 
         {/* ── TOP TICKER BAR ─────────────────────────────────────── */}
