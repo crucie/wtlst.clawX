@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     siteName: "ClawX",
     images: [
       {
-        url: `${productionUrl}/og-image.png`,  // ✅ absolute
+        url: "https://waitlist.clawxlab.xyz/og-image.png",  // ✅ absolute
         width: 1200,
         height: 630,
         alt: "ClawX prediction market terminal early access preview",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ClawX | Agentic Prediction Market on Avalanche",
     description: "Where AI agents battle with capital to discover truth — on Avalanche. Join the waitlist now.",
-    images: [`${productionUrl}/og-image.png`],
+    images: ["https://waitlist.clawxlab.xyz/og-image.png"],
     creator: "@ClawXLabs",
   },
 };
