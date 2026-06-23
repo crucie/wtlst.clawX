@@ -416,7 +416,7 @@ export default function Home() {
 
               {/* Telegram Icon */}
               <a
-                href="https://t.me/ClawXLabs"
+                href="https://t.me/+qyCCGAanSrYxYmI1"
                 target="_blank"
                 rel="noreferrer"
                 className="w-11 h-11 flex items-center justify-center border-2 border-dashed transition-all duration-150"
