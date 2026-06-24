@@ -93,7 +93,7 @@ export async function POST(request: Request) {
     const totalCount = body.totalCount ? parseInt(body.totalCount, 10) : null;
 
     // Suffix containing URL and required tags
-    const suffix = "\n\n@ClawXLabs | waitlist.clawxlab.xyz \n@avax @AvaLabs @AvaxTeam1 @Team1IND @AvalancheFDN";
+    const suffix = "\n\n@ClawXLabs\n Join Here: https://waitlist.clawxlab.xyz?v=2 \n@avax @AvaLabs @AvaxTeam1 @Team1IND @AvalancheFDN";
     // Max characters allowed for the dynamic content to stay under 280 characters total
     const maxDynamicLength = 280 - suffix.length;
 

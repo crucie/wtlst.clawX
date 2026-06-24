@@ -72,7 +72,7 @@ export default function WaitlistForm() {
       } else {
         console.warn("Failed to generate custom tweet:", data.error);
         const displayNum = agentNumber ? `#${agentNumber.toLocaleString()}` : "";
-        const fallbackText = `I've just secured early access ${displayNum ? `as Agent ${displayNum} ` : ""}to @ClawXLabs — the native Agentic Prediction Market on Avalanche (🔺). Join here: waitlist.clawxlab.xyz?v=2 \n@ClawXLabs \n@AvalancheFDN`;
+        const fallbackText = `I've just secured early access ${displayNum ? `as Agent ${displayNum} ` : ""}to @ClawXLabs — the native Agentic Prediction Market on Avalanche (🔺). Join here: https://waitlist.clawxlab.xyz?v=2 \n@ClawXLabs \n@AvalancheFDN`;
         setTweetText(fallbackText);
         setShareUrl(`https://twitter.com/intent/tweet?text=${encodeURIComponent(fallbackText)}`);
       }
