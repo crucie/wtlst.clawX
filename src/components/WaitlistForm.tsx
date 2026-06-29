@@ -352,7 +352,7 @@ export default function WaitlistForm() {
                 >
                   <div className="mb-6">
                     <h2
-                      className="font-mono font-bold uppercase mb-2"
+                      className="font-mono font-bold uppercase mb-2 text-center"
                       style={{
                         fontSize: "clamp(20px, 3.5vw, 30px)",
                         color: "var(--clx-red)",
@@ -363,7 +363,7 @@ export default function WaitlistForm() {
                       Congratulations!
                     </h2>
                     <h3
-                      className="font-mono font-bold uppercase mb-4"
+                      className="font-mono font-bold uppercase mb-4 text-center"
                       style={{
                         fontSize: "clamp(15px, 2.5vw, 20px)",
                         color: "var(--clx-text)",
@@ -373,21 +373,95 @@ export default function WaitlistForm() {
                     >
                       You have allocated Agent #{waitlistCount !== null ? waitlistCount.toLocaleString() : "..."} for yourself
                     </h3>
-                    <p
+
+                    {/* Compulsory follow warning + buttons */}
+                    <div
+                      className="mb-6 p-4"
+                      style={{
+                        border: "2px solid var(--clx-red)",
+                        background: "var(--clx-error-bg)",
+                      }}
+                    >
+                      <div
+                        className="font-mono text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"
+                        style={{ color: "var(--clx-red)" }}
+                      >
+                        <span>⚠</span>
+                        <span>MANDATORY // FOLLOW TO CONFIRM REGISTRATION</span>
+                      </div>
+                      <p
+                        className="font-mono text-[10px] uppercase leading-relaxed mb-4"
+                        style={{ color: "var(--clx-text-muted)", letterSpacing: "0.06em" }}
+                      >
+                        You must follow us on both platforms to validate your waitlist entry. Unverified registrations will not be processed.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <a
+                          href="https://t.me/+qyCCGAanSrYxYmI1"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex-1 py-3 font-mono font-bold text-xs uppercase tracking-widest text-center transition-all duration-150 flex items-center justify-center gap-2"
+                          style={{
+                            background: "var(--clx-red)",
+                            border: "2px solid var(--clx-red)",
+                            color: isLight ? "#fff" : "#000",
+                          }}
+                          onMouseEnter={(e) => {
+                            (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
+                            (e.currentTarget as HTMLAnchorElement).style.color = "var(--clx-red)";
+                          }}
+                          onMouseLeave={(e) => {
+                            (e.currentTarget as HTMLAnchorElement).style.background = "var(--clx-red)";
+                            (e.currentTarget as HTMLAnchorElement).style.color = isLight ? "#fff" : "#000";
+                          }}
+                        >
+                          <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                            <path d="M11.944 0C5.344 0 0 5.344 0 12c0 6.656 5.344 12 11.944 12 6.6 0 12-5.344 12-12 0-6.656-5.4-12-12-12zm5.544 8.4l-1.92 9.072c-.144.648-.528.804-1.08.492l-2.928-2.16-1.416 1.368c-.156.156-.288.288-.588.288l.21-2.988 5.436-4.92c.24-.216-.048-.336-.36-.132l-6.72 4.224-2.892-.9c-.636-.204-.648-.636.132-.936l11.292-4.356c.528-.192.984.12.828.948z" />
+                          </svg>
+                          JOIN TELEGRAM
+                        </a>
+                        <a
+                          href="https://x.com/intent/follow?screen_name=ClawXLabs"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex-1 py-3 font-mono font-bold text-xs uppercase tracking-widest text-center transition-all duration-150 flex items-center justify-center gap-2"
+                          style={{
+                            background: "var(--clx-red)",
+                            border: "2px solid var(--clx-red)",
+                            color: isLight ? "#fff" : "#000",
+                          }}
+                          onMouseEnter={(e) => {
+                            (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
+                            (e.currentTarget as HTMLAnchorElement).style.color = "var(--clx-red)";
+                          }}
+                          onMouseLeave={(e) => {
+                            (e.currentTarget as HTMLAnchorElement).style.background = "var(--clx-red)";
+                            (e.currentTarget as HTMLAnchorElement).style.color = isLight ? "#fff" : "#000";
+                          }}
+                        >
+                          <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                          </svg>
+                          FOLLOW ON X
+                        </a>
+                      </div>
+                    </div>
+
+                    {/* <p
                       className="font-mono text-[11px] uppercase leading-relaxed mb-6"
                       style={{ color: "var(--clx-text-muted)", letterSpacing: "0.08em" }}
                     >
                       Your registration key has been compiled and secured on the Avalanche network.
                       Share your entry to amplify agent presence and verify your early access allocation.
-                    </p>
+                    </p> */}
 
-                    <div
+                    {/* <div
                       className="font-mono text-[10px] uppercase tracking-widest mb-1"
                       style={{ color: "var(--clx-text-comment)" }}
                     >
                       Registered Address:
-                    </div>
-                    <div
+                    </div> */}
+                    {/* <div
                       className="font-mono text-xs uppercase tracking-widest mb-6 px-3 py-2"
                       style={{
                         color: "var(--clx-red)",
@@ -396,7 +470,7 @@ export default function WaitlistForm() {
                       }}
                     >
                       {registeredEmail}
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Dynamic Post Preview (without input editor) */}
@@ -421,19 +495,19 @@ export default function WaitlistForm() {
                       rel="noreferrer"
                       className="w-full py-3 font-mono font-bold text-xs uppercase tracking-widest text-center transition-all duration-150"
                       style={{
-                        background: "transparent",
+                        background: "var(--clx-red)",
                         border: "2px solid var(--clx-red)",
-                        color: "var(--clx-red)",
+                        color: isLight ? "#fff" : "#000",
                         pointerEvents: shareUrl ? "auto" : "none",
                         opacity: shareUrl ? 1 : 0.5,
                       }}
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLAnchorElement).style.background = "var(--clx-red)";
-                        (e.currentTarget as HTMLAnchorElement).style.color = isLight ? "#fff" : "#000";
-                      }}
-                      onMouseLeave={(e) => {
                         (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
                         (e.currentTarget as HTMLAnchorElement).style.color = "var(--clx-red)";
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLAnchorElement).style.background = "var(--clx-red)";
+                        (e.currentTarget as HTMLAnchorElement).style.color = isLight ? "#fff" : "#000";
                       }}
                     >
                       [ SHARE ON X // @CLAWXLABS ]
